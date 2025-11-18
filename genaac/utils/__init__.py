@@ -14,3 +14,5 @@ from .image import (
     decode_image_from_bytes,
     decode_image_from_str,
 )
+
+from .imagen_client import generate_imagen_response
