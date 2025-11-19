@@ -8,3 +8,5 @@ ROOT_DIR = Path(__file__).parent
 
 load_dotenv()
 
+
+from .tokenize import tokenize
