@@ -131,14 +131,26 @@ new_img.show()
 
 ### Base64 문자열 변환
 
-웹 API 등으로 전송할 때 주로 사용합니다.
+Bytes를 Base64 문자열로 변환하거나, Base64 문자열을 이미지로 복원할 때 사용합니다.
 
 ```python
-from genaac.utils.image import encode_image_to_str, decode_image_from_str
+from genaac.utils.image import bytes_to_str, decode_image_from_str
 
-# PIL Image -> Base64 String
-b64_str = encode_image_to_str(img)
+# Bytes -> Base64 String
+b64_str = bytes_to_str(img_bytes)
 
 # Base64 String -> PIL Image
 restored_img = decode_image_from_str(b64_str)
+```
+
+### Data URL 생성
+
+이미지를 웹에서 바로 표시할 수 있는 Data URL 형식으로 변환합니다.
+
+```python
+from genaac.utils.image import png_to_url
+
+# PNG Bytes -> Data URL
+data_url = png_to_url(img_bytes)
+print(data_url) # "data:image/png;base64,iVBORw0KG..."
 ```
