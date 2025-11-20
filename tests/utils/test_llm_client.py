@@ -1,4 +1,4 @@
-# tests/utils/llm_client
+# tests/utils/test_llm_client
 
 from pydantic import BaseModel
 

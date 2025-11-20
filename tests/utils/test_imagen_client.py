@@ -1,4 +1,4 @@
-# tests/utils/imagen_client.py
+# tests/utils/test_imagen_client.py
 
 from genaac.utils import generate_imagen_response
 from genaac.utils import decode_image_from_bytes

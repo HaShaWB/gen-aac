@@ -1,4 +1,4 @@
-# tests/utils/gcp_data_client.py
+# tests/utils/test_gcp_data_client.py
 
 from PIL import Image
 
