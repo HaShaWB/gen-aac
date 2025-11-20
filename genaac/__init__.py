@@ -11,3 +11,4 @@ load_dotenv()
 
 from .tokenize import tokenize
 from .token_imaging import token_imaging
+from .token_editing import edit_token
