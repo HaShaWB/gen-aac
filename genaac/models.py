@@ -1,6 +1,6 @@
 # genaac/models/token.py
 
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 from pydantic import BaseModel
 
@@ -13,8 +13,15 @@ class Token(BaseModel):
         return self.keyword if self.query is None else f"{self.keyword} ({self.query})"
     
 
-class TokenPromptPair(Token):
+class TokenPromptPair(BaseModel):
+    token: Token
     prompt: str
+
+    def to_shot(self) -> List[Dict]:
+        return [
+            {"role": "user", "content": str(self.token)},
+            {"role": "assistant", "content": self.prompt}
+        ]
 
 
 class TokenPromptImagePair(TokenPromptPair):
