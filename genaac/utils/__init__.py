@@ -10,7 +10,8 @@ from .gcp_data_client import (
 
 from .image import (
     encode_image,
-    encode_image_to_str,
+    bytes_to_str,
+    png_to_url,
     decode_image_from_bytes,
     decode_image_from_str,
 )

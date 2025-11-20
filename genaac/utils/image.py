@@ -7,15 +7,17 @@ from PIL import Image
 
 
 def encode_image(image: Image.Image) -> bytes:
-    img_byte_arr = BytesIO()
-    image.save(img_byte_arr, format='PNG')
-    img_bytes = img_byte_arr.getvalue()
-    return img_bytes
+    buffer = BytesIO()
+    image.save(buffer, format='PNG')
+    return buffer.getvalue()
 
 
-def encode_image_to_str(image: Image.Image) -> str:
-    img_bytes = encode_image(image)
-    return base64.b64encode(img_bytes).decode('utf-8')
+def bytes_to_str(bytes: bytes) -> str:
+    return base64.b64encode(bytes).decode('utf-8')
+
+
+def png_to_url(png_bytes: bytes) -> str:
+    return f"data:image/png;base64,{bytes_to_str(png_bytes)}"
     
 
 def decode_image_from_bytes(image_bytes: bytes) -> Image.Image:
