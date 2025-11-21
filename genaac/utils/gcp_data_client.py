@@ -43,9 +43,13 @@ def make_id(prefix: Optional[str] = None) -> str:
     return document_id
 
 
-def upload_file(file: bytes, blob_name: str) -> Optional[str]:
+def upload_file(file: bytes, blob_name: str, bucket_name: Optional[str] = None) -> Optional[str]:
     try:
-        blob = bucket_client.blob(blob_name)
+        if bucket_name is None:
+            blob = bucket_client.blob(blob_name)
+        else: 
+            bucket = storage_client.bucket(bucket_name)
+            blob = bucket.blob(blob_name)
         blob.upload_from_string(file)
         return blob.public_url
     except Exception as e:
@@ -53,9 +57,13 @@ def upload_file(file: bytes, blob_name: str) -> Optional[str]:
         return None
 
 
-def download_file(blob_name: str) -> Optional[bytes]:
+def download_file(blob_name: str, bucket_name: Optional[str] = None) -> Optional[bytes]:
     try:
-        blob = bucket_client.blob(blob_name)
+        if bucket_name is None:
+            blob = bucket_client.blob(blob_name)
+        else:
+            bucket = storage_client.bucket(bucket_name)
+            blob = bucket.blob(blob_name)
         return blob.download_as_bytes()
     except Exception as e:
         print(f"[DATA] Error downloading file from bucket: {e}")
