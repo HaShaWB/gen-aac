@@ -29,6 +29,8 @@ class TokenPromptPair(BaseModel):
 class TokenPromptImagePair(TokenPromptPair):
     image: bytes
 
+    def to_image_url(self) -> str:
+        return png_to_url(self.image)
 
 
 class TokenizingResponse(BaseModel):

@@ -34,7 +34,11 @@ class UserData(BaseModel):
 
 
     def add_history(self, history: EditingHistory):
-        self.gallery.append(history)
+
+        if history.initial_pair.token.keyword in self.get_index().keys():
+            self.gallery[self.get_index()[history.initial_pair.token.keyword]] = history
+        else:       
+            self.gallery.append(history)
         self.gallery_indexing()
 
     
@@ -44,9 +48,9 @@ class UserData(BaseModel):
 
     
     @staticmethod
-    def from_server(user_id: str):
+    def from_server(user_id: str) -> Optional["UserData"]:
         data = download_file(f"{user_id}.json", bucket_name="genaac-user-data")
         if data:
             return UserData.model_validate_json(data)
         else:
-            return UserData(user_id=user_id)
+            return None
