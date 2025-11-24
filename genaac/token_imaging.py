@@ -2,6 +2,7 @@
 
 from pathlib import Path
 from typing import List
+from concurrent.futures import ThreadPoolExecutor
 
 from genaac.utils import generate_llm_response, generate_imagen_response
 from genaac.models import TokenPromptPair, Token, TokenPromptImagePair
@@ -33,3 +34,18 @@ def token_imaging(token: Token, few_shots: List[TokenPromptPair] = list()) -> To
         prompt=prompt,
         image=image
     )
+
+
+def token_imaging_batch(
+    tokens: List[Token], 
+    few_shots: List[TokenPromptPair] = list(), 
+    max_workers: int = 5
+) -> List[TokenPromptImagePair]:
+    
+    def _process_single(token: Token) -> TokenPromptImagePair:
+        return token_imaging(token, few_shots)
+    
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        results = list(executor.map(_process_single, tokens))
+    
+    return results
