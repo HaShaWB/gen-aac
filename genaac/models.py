@@ -2,6 +2,7 @@
 
 from typing import List, Optional, Dict
 
+import pandas as pd
 from pydantic import BaseModel
 
 from genaac.utils import png_to_url
@@ -81,3 +82,20 @@ class EditingHistory(BaseModel):
             return self.history[-1].result
         else:
             return self.initial_pair
+
+
+
+class SentencePair(BaseModel):
+    sentence: str
+    pairs: List[TokenPromptImagePair]
+
+    def to_df(self):
+        rows = [
+            {
+                "keyword": pair.token.keyword,
+                "image": pair.to_image_url()
+            }
+            for pair in self.pairs
+        ]
+
+        return pd.DataFrame(rows)

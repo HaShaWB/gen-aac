@@ -4,7 +4,7 @@ from typing import Literal
 
 import streamlit as st
 
-from widgets import login
+from widgets import login, sentence_widget
 
 
 st.set_page_config(
@@ -15,3 +15,6 @@ st.set_page_config(
 
 if "user_id" not in st.session_state:
     login()
+
+else:
+    sentence_widget()
