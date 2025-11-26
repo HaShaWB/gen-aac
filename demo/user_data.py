@@ -12,7 +12,7 @@ class UserData(BaseModel):
     user_id: str
     gallery: Optional[List[EditingHistory]] = list()
 
-    gallery_index: Optional[Dict[str, int]] = None
+    gallery_index: Optional[Dict[str, int]] = dict()
 
 
     def gallery_indexing(self):
@@ -23,8 +23,7 @@ class UserData(BaseModel):
 
     
     def get_index(self) -> Dict[str, int]:
-        if self.gallery_index is None:
-            self.gallery_index = self.gallery_indexing()
+        self.gallery_indexing()
         return self.gallery_index
 
 
@@ -41,7 +40,15 @@ class UserData(BaseModel):
             self.gallery.append(history)
         self.gallery_indexing()
 
-    
+    def remove_history(self, keyword: str):
+        idx = self.get_index()[keyword]
+        self.gallery.pop(idx)
+        self.gallery_indexing()
+
+    def pop_history(self, index: int):
+        self.gallery.pop(index)
+        self.gallery_indexing()
+
     def upload_to_server(self):
         upload_file(self.model_dump_json(), f"{self.user_id}.json", bucket_name="genaac-user-data")
         return self.user_id
@@ -54,3 +61,4 @@ class UserData(BaseModel):
             return UserData.model_validate_json(data)
         else:
             return None
+            

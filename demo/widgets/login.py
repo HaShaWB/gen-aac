@@ -24,8 +24,9 @@ def login():
             st.success(f"로그인 성공: {user_id}")
 
         else:
-            st.session_state.user_data = UserData(user_id=user_id)
+            st.session_state.user_data = UserData.from_server("default")
+            st.session_state.user_data.user_id = user_id
             st.warning(f"새로운 사용자 생성: {user_id}")
             st.session_state.user_data.upload_to_server()
+            st.rerun()
 
-        st.rerun()
