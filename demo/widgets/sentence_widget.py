@@ -28,21 +28,22 @@ def sentence_widget():
 
     is_sentence_generating = st.session_state.get("is_sentence_generating", False)
 
-    sentence = st.text_input("문장 입력", disabled=is_sentence_generating)
+    sentence = st.chat_input("문장 입력", disabled=is_sentence_generating)
     st.session_state.sentence = sentence
 
     if sentence:
         st.session_state["is_sentence_generating"] = True
 
         with st.spinner("문장 변환 중입니다"):
-            pairs = tokenize(sentence)
-            t_pairs = token_imaging_batch(pairs.tokens)
+            print(f"[Sentence Widget] Tokenizing sentence: {sentence}")
+            pairs = tokenize(sentence).tokens
+            print(f"[Sentence Widget] Imaging Keywords: " + ", ".join([pair.keyword for pair in pairs]))
+            t_pairs = token_imaging_batch(pairs)
+            print(f"[Sentence Widget] Finished Sentence: {sentence}")
             sentence_pair = SentencePair(sentence=sentence, pairs=t_pairs)
 
         st.session_state.sentence_pair = sentence_pair
         st.session_state.is_sentence_generating = False
-
-        st.rerun()
 
 
     if st.session_state.get("sentence_pair", False):
@@ -54,7 +55,7 @@ def sentence_widget():
         df["Stared"] = [False] * len(df)
 
 
-        clicked = st.data_editor(
+        data = st.data_editor(
             df,
             height="stretch",
             row_height=120,
@@ -64,12 +65,12 @@ def sentence_widget():
         clicked = st.button("Save Stared Symbols")
 
         if clicked:
-            for idx, row in clicked.iterrows():
+            for idx, row in data.iterrows():
                 if row["Stared"]:
                     st.session_state.user_data.add_history(
                         EditingHistory(initial_pair=sentence_pair.pairs[idx])
                     )
             
             st.session_state.user_data.upload_to_server()
-
-            st.rerun()
+            st.success("Saved Stared Symbols")
+            print(f"[Sentence Widget] Saved Stared Symbols")

@@ -1,9 +1,10 @@
 # genaac/models/token.py
 
 from typing import List, Optional, Dict
+import base64
 
 import pandas as pd
-from pydantic import BaseModel
+from pydantic import BaseModel, field_serializer, field_validator
 
 from genaac.utils import png_to_url
 
@@ -32,6 +33,21 @@ class TokenPromptImagePair(TokenPromptPair):
 
     def to_image_url(self) -> str:
         return png_to_url(self.image)
+    
+
+    # JSON 직렬화시 bytes를 base64 문자열로 변환
+    @field_serializer('image')
+    def serialize_image(self, value: bytes) -> str:
+        return base64.b64encode(value).decode('utf-8')
+    
+
+    # JSON 역직렬화시 base64 문자열을 bytes로 변환
+    @field_validator('image', mode='before')
+    @classmethod
+    def validate_image(cls, value):
+        if isinstance(value, str):
+            return base64.b64decode(value)
+        return value
 
 
 class TokenizingResponse(BaseModel):
