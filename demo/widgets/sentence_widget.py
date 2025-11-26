@@ -6,6 +6,10 @@ from genaac import tokenize, token_imaging_batch
 from genaac.models import SentencePair, EditingHistory
 
 
+# 임시 Few Shot -> 이후에는 자동 Few Shot (RAG) 추가 예정
+FEW_SHOTS_SYMBOLS = {"좋아", "싫어", "먹다", "물음"} 
+
+
 def sentence_widget():
     
     st.title("GenAAC")
@@ -31,6 +35,13 @@ def sentence_widget():
     sentence = st.chat_input("문장 입력", disabled=is_sentence_generating)
     st.session_state.sentence = sentence
 
+
+    few_shots = [
+        history.get_final_pair()
+        for history in st.session_state.user_data.gallery
+        if history.get_final_pair().token.keyword in FEW_SHOTS_SYMBOLS
+    ]
+
     if sentence:
         st.session_state["is_sentence_generating"] = True
 
@@ -38,7 +49,7 @@ def sentence_widget():
             print(f"[Sentence Widget] Tokenizing sentence: {sentence}")
             pairs = tokenize(sentence).tokens
             print(f"[Sentence Widget] Imaging Keywords: " + ", ".join([pair.keyword for pair in pairs]))
-            t_pairs = token_imaging_batch(pairs)
+            t_pairs = token_imaging_batch(pairs, few_shots=few_shots)
             print(f"[Sentence Widget] Finished Sentence: {sentence}")
             sentence_pair = SentencePair(sentence=sentence, pairs=t_pairs)
 
@@ -50,27 +61,38 @@ def sentence_widget():
         st.success(f"변환 완료: {st.session_state.sentence_pair.sentence}")
         sentence_pair = st.session_state.sentence_pair
 
-        df = sentence_pair.to_df()
 
-        df["Stared"] = [False] * len(df)
+        n_of_symbols = len(sentence_pair.pairs)
+
+        cols = st.columns(n_of_symbols)
+
+        for col, pair in zip(cols, sentence_pair.pairs):
+            col.image(pair.image, width=120)
+            col.subheader(pair.token.keyword)
 
 
-        data = st.data_editor(
-            df,
-            height="stretch",
-            row_height=120,
-            column_config={"image": st.column_config.ImageColumn("AAC Image")}
-        )
+        with st.expander("상세 보기"):
 
-        clicked = st.button("Save Stared Symbols")
+            df = sentence_pair.to_df()
 
-        if clicked:
-            for idx, row in data.iterrows():
-                if row["Stared"]:
-                    st.session_state.user_data.add_history(
-                        EditingHistory(initial_pair=sentence_pair.pairs[idx])
-                    )
-            
-            st.session_state.user_data.upload_to_server()
-            st.success("Saved Stared Symbols")
-            print(f"[Sentence Widget] Saved Stared Symbols")
+            df["Stared"] = [False] * len(df)
+
+            data = st.data_editor(
+                df,
+                height="stretch",
+                row_height=120,
+                column_config={"image": st.column_config.ImageColumn("AAC Image")}
+            )
+
+            clicked = st.button("Save Stared Symbols")
+
+            if clicked:
+                for idx, row in data.iterrows():
+                    if row["Stared"]:
+                        st.session_state.user_data.add_history(
+                            EditingHistory(initial_pair=sentence_pair.pairs[idx])
+                        )
+                
+                st.session_state.user_data.upload_to_server()
+                st.success("Saved Stared Symbols")
+                print(f"[Sentence Widget] Saved Stared Symbols")

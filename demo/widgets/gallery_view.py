@@ -7,6 +7,11 @@ from genaac import token_imaging, edit_token
 from genaac.models import EditingHistory, Token
 
 
+DEFAULT_SYMBOLS = {"좋아", "싫어", "먹다", "물음"}
+
+# 임시 Few Shot -> 이후에는 자동 Few Shot (RAG) 추가 예정
+FEW_SHOTS_SYMBOLS = {"좋아", "싫어", "먹다", "물음"} 
+
 def symbol_view(index: int):
     user_data = st.session_state.user_data
     history: EditingHistory = user_data.gallery[index]
@@ -18,14 +23,15 @@ def symbol_view(index: int):
     with left:
         clicked_left = st.button("삭제")
         if clicked_left:
-            if len(user_data.gallery) == 1:
-                st.error("최소 1개의 심볼이 있어야 합니다")
-                return
-            user_data.pop_history(index)
-            user_data.upload_to_server()
-            st.success("심볼 삭제 완료")
-            st.session_state.gallery_selected_idx = -1
-            st.rerun()
+            if history.get_final_pair().token.keyword in DEFAULT_SYMBOLS:
+                st.error("기본 심볼은 삭제할 수 없습니다 (수정만 가능합니다.)")
+            
+            else:
+                user_data.pop_history(index)
+                user_data.upload_to_server()
+                st.success("심볼 삭제 완료")
+                st.session_state.gallery_selected_idx = -1
+                st.rerun()
     
     with right:
         clicked_right = st.button("기록 초기화")
@@ -83,7 +89,11 @@ def new_symbol():
             with st.spinner("새로운 심볼 추가 중입니다"):
                 token = Token(keyword=keyword, query=query)
 
-                pair = token_imaging(token)
+                pair = token_imaging(token, few_shots=[
+                    history.get_final_pair()
+                    for history in st.session_state.user_data.gallery
+                    if history.get_final_pair().token.keyword in FEW_SHOTS_SYMBOLS
+                ])
 
                 history = EditingHistory(initial_pair=pair)
 
@@ -94,6 +104,7 @@ def new_symbol():
             st.rerun()
 
     if clicked_right:
+        st.rerun()
         return
 
 

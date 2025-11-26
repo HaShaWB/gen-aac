@@ -18,7 +18,7 @@ if "user_id" not in st.session_state:
 
 else:
     if "current_page" not in st.session_state:
-        st.session_state.current_page = "sentence"
+        st.session_state.current_page = "gallery"
     
     with st.sidebar:
         st.title("GenAAC")
@@ -26,7 +26,7 @@ else:
         page = st.radio(
             "페이지 선택",
             ["sentence", "gallery"],
-            format_func=lambda x: "문장 변환" if x == "sentence" else "갤러리",
+            format_func=lambda x: "문장 변환" if x == "sentence" else "gallery",
             key="current_page"
         )
     
@@ -35,5 +35,6 @@ else:
     with center:
         if st.session_state.current_page == "sentence":
             sentence_widget()
-        else:
+        elif st.session_state.current_page == "gallery":
             gallery_view()
+    

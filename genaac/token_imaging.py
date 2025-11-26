@@ -16,7 +16,7 @@ TOKEN_IMAGING_PROMPT = (ROOT_DIR / "prompts" / "token_imaging_prompt.md").read_t
 def token_to_prompt(token: Token, few_shots: List[TokenPromptPair] = list()) -> str:
 
     messages = [{"role": "system", "content": TOKEN_IMAGING_PROMPT}] \
-        + [shot.to_shot() for shot in few_shots] \
+        + [msg for shot in few_shots for msg in shot.to_shot()] \
         + [{"role": "user", "content": str(token)}]
 
     response = generate_llm_response(messages)
