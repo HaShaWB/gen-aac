@@ -17,5 +17,5 @@ if "user_id" not in st.session_state:
     login()
 
 else:
-    sentence_widget()
-    # gallery_view()
+    # sentence_widget()
+    gallery_view()
