@@ -3,7 +3,7 @@
 import streamlit as st
 from st_clickable_images import clickable_images
 
-from genaac import token_imaging
+from genaac import token_imaging, edit_token
 from genaac.models import EditingHistory, Token
 
 
@@ -45,6 +45,19 @@ def symbol_view(index: int):
             st.write(turn.response.answer_to_user)
             st.image(turn.result.to_image_url(), width=120)
     
+    feedback = st.chat_input("수정하고 싶은 점을 입력해주세요")
+
+    if feedback:
+        with st.spinner("심볼 수정 중입니다"):
+            turn = edit_token(history, feedback)
+            history.add_turn(turn)
+            user_data.upload_to_server()
+            st.success("심볼 수정 완료")
+            st.rerun()
+
+
+
+    
 @st.dialog("Add New", dismissible=False)
 def new_symbol():
     st.header("새로운 심볼 추가하기")
@@ -85,13 +98,7 @@ def new_symbol():
 
 
 def gallery_view():
-
-    st.set_page_config(
-        page_title="GenAAC Gallery",
-        layout="wide",
-    )
-
-
+    # set_page_config는 app.py에서 한 번만 호출
     user_data = st.session_state.user_data
     gallery= user_data.gallery
 
@@ -99,13 +106,14 @@ def gallery_view():
     st.session_state.gallery_selected_idx = st.session_state.get("gallery_selected_idx", -1)
 
     
-    _, left, right, _ = st.columns([1, 3, 1, 1])
+    left, right = st.columns([3, 2])
 
     with left:
         st.title("GenAAC")
         st.header("GenAAC Gallery")
         st.markdown("""
-        아래 갤러리에서 사용자님이 저장한 키워드와 심볼을 확인할 수 있습니다. (기본 제공 키워드 포함)
+        아래 갤러리에서 사용자님이 저장한 키워드와 심볼을 확인할 수 있습니다. 
+        (기본 제공 키워드 포함)
 
         심볼을 클릭하여 더 자세한 설명을 확인하고, 심볼을 삭제, 수정할 수 있습니다.
         이 키워드들은 향후 사용자님이 문장을 변환할 때 우선하여 사용되게됩니다.

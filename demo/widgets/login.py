@@ -22,6 +22,7 @@ def login():
         if user_data:
             st.session_state.user_data = user_data
             st.success(f"로그인 성공: {user_id}")
+            st.rerun()
 
         else:
             st.session_state.user_data = UserData.from_server("default")
