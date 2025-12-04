@@ -9,13 +9,16 @@ from .gcp_data_client import (
 )
 
 from .image import (
-    encode_image,
+    image_to_bytes,
+    file_to_bytes,
     bytes_to_str,
-    png_to_url,
-    decode_image_from_bytes,
-    decode_image_from_str,
+    bytes_to_image,
+    bytes_to_url,
+    url_to_image,
+    url_to_bytes,
 )
 
-from .imagen_client import generate_imagen_response
-
-from .llm_client import generate_llm_response, generate_llm_response_in_json
+from .nano_banana import (
+    ImageTextPair,
+    nano_banana,
+)

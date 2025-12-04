@@ -8,8 +8,9 @@ from genaac.utils import (
     download_file,
     upload_document,
     download_document,
-    encode_image,
-    decode_image_from_bytes,
+
+    image_to_bytes,
+    bytes_to_image,
 )
 
 
@@ -23,7 +24,7 @@ print()
 # 2. upload_file
 print("2. upload_file")
 image = Image.open("tests/utils/test_image.png")
-image_bytes = encode_image(image)
+image_bytes = image_to_bytes(image)
 url = upload_file(image_bytes, "test_image.png")
 print(f"url: {url}")
 print()
@@ -32,8 +33,9 @@ print()
 # 3. download_file
 print("3. download_file")
 image_bytes = download_file("test_image.png")
-image = decode_image_from_bytes(image_bytes)
+image = bytes_to_image(image_bytes)
 image.show()
+image.save("tests/utils/test_image.png")
 print()
 
 

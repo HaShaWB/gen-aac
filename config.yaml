@@ -4,7 +4,7 @@ database:
   aac_log_database_id: "genaac-api-log"
   
 model:
-  primary_llm: "gemini/gemini-3-pro-preview" 
-  secondary_llm: "claude-sonnet-4-5-20250929"
+  primary_banana: "openrouter/google/gemini-3-pro-image-preview"
+  secondary_banana: "gemini/gemini-3-pro-image-preview"
   imagen: "imagen-4.0-generate-001"
 
