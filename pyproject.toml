@@ -1,5 +1,5 @@
 [project]
-name = "gen-aac"
+name = "genaac"
 version = "0.1.0"
 description = "Generating AAC Symbol using Generative AI"
 readme = "README.md"
