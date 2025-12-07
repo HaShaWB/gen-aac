@@ -8,9 +8,8 @@ from genaac.utils import (
     download_file,
     upload_document,
     download_document,
-
-    image_to_bytes,
     bytes_to_image,
+    image_to_bytes,
 )
 
 
@@ -34,8 +33,8 @@ print()
 print("3. download_file")
 image_bytes = download_file("test_image.png")
 image = bytes_to_image(image_bytes)
-image.show()
 image.save("tests/utils/test_image.png")
+image.show()
 print()
 
 

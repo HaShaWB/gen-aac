@@ -1,10 +1,6 @@
 # genaac/__init__.py
 
-from dotenv import load_dotenv
+from .config import CONFIG, ROOT_DIR
 
-load_dotenv()
-
-from .symbol_generation import (
-    symbol_generation,
-    symbol_generation_batch,
-)
+from .aac_from_image import aac_from_image, aac_from_image_parallel
+from .aac_from_keyword import aac_from_keyword, aac_from_keyword_parallel
