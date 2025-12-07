@@ -2,9 +2,17 @@ database:
   project_id: "gen-aac-2025"
   aac_image_bucket_name: "genaac-image-log"
   aac_log_database_id: "genaac-api-log"
+  user_data_bucket_name: "genaac-user-data"
   
 model:
-  primary_llm: "gemini/gemini-3-pro-preview" 
-  secondary_llm: "claude-sonnet-4-5-20250929"
+  primary_llm: "openrouter/google/gemini-3-pro-preview" 
+  secondary_llm: "gemini/gemini-3-pro-preview"
+
+  primary_banana: "openrouter/google/gemini-3-pro-image-preview"
+  secondary_banana: "gemini/gemini-3-pro-image-preview"
+
+  primary_keyword_llm: "openrouter/google/gemini-2.5-flash"
+  secondary_keyword_llm: "gemini/gemini-2.5-flash"
+
   imagen: "imagen-4.0-generate-001"
 

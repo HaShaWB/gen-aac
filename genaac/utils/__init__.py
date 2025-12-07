@@ -1,21 +1,35 @@
 # genaac/utils/__init__.py
 
+from .image import (
+    bytes_to_image,
+    bytes_to_base64,
+    bytes_to_url,
+    file_to_bytes,
+    image_to_bytes,
+    base64_to_bytes,
+    url_to_bytes,
+)
+
 from .gcp_data_client import (
     make_id,
     upload_file,
     download_file,
+    list_files,
+    download_folder,
+    upload_folder,
     upload_document,
     download_document,
 )
 
-from .image import (
-    encode_image,
-    bytes_to_str,
-    png_to_url,
-    decode_image_from_bytes,
-    decode_image_from_str,
+from .llm import (
+    generate_llm_response,
+    generate_llm_response_in_json,
+    generate_llm_response_parallel,
+    generate_llm_response_in_json_parallel,
 )
 
-from .imagen_client import generate_imagen_response
-
-from .llm_client import generate_llm_response, generate_llm_response_in_json
+from .banana import (
+    generate_banana_response,
+    generate_banana_response_parallel,
+    ImageTextPair,
+)

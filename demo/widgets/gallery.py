@@ -1,0 +1,50 @@
+# demo/widgets/gallery.py
+
+import streamlit as st
+
+
+def gallery():
+    user_data = st.session_state.user_data
+    gallery = user_data.symbol_gallery
+
+    # 5열 배치를 위해 아이템들을 리스트로 변환
+    items = list(gallery.items())
+    
+    # 5개씩 묶어서 행 단위로 처리
+    for row_start in range(0, len(items), 5):
+        cols = st.columns(5)
+        row_items = items[row_start:row_start + 5]
+        
+        for col_idx, (keyword, pair) in enumerate(row_items):
+            with cols[col_idx]:
+                with st.container(
+                    border=True,
+                    width=240,
+                    height=240,
+                    horizontal_alignment="center",
+                    # vertical_alignment="center",
+                ):
+                    st.image(pair.image, width="stretch", output_format="PNG")
+                    
+                    # 재생성 중인지 확인
+                    is_regenerating = st.session_state.get("regenerating", False)
+                    
+                    clicked = st.button(
+                        label=f"{keyword}",
+                        width="stretch",
+                        disabled=is_regenerating,
+                        key=f"gallery_btn_{keyword}"
+                    )
+                    if clicked:
+                        st.session_state["regenerating"] = True
+                        st.session_state["regenerating_keyword"] = keyword
+                        st.rerun()
+                    
+                    # 재생성 실행 (별도 블록에서 처리)
+                    if is_regenerating and st.session_state.get("regenerating_keyword") == keyword:
+                        with st.spinner("Symbol 재생성 중..."):
+                            user_data.regenerate_symbol(keyword, converting_keyword=False)
+                            st.session_state["regenerating"] = False
+                            st.session_state.pop("regenerating_keyword", None)
+                            st.rerun()
+                    

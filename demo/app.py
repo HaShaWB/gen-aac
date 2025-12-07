@@ -1,40 +1,27 @@
 # demo/app.py
 
-from typing import Literal
-
 import streamlit as st
 
-from widgets import login, sentence_widget, gallery_view
+from demo.user_data import UserData
+from demo.widgets.gallery import gallery
 
 
-st.set_page_config(
-    page_title="GenAAC",
-    layout="wide",
-)
+st.session_state.user_data: UserData = UserData()
+st.session_state.user_data.download_server()
 
+st.set_page_config(page_title="AAC Symbol Generator", page_icon=":art:")
 
-if "user_id" not in st.session_state:
-    login()
+st.space("medium")
+st.title("GenAAC Demo")
 
-else:
-    if "current_page" not in st.session_state:
-        st.session_state.current_page = "gallery"
-    
-    with st.sidebar:
-        st.title("GenAAC")
-        
-        page = st.radio(
-            "페이지 선택",
-            ["sentence", "gallery"],
-            format_func=lambda x: "문장 변환" if x == "sentence" else "gallery",
-            key="current_page"
-        )
-    
-    _, center, _ = st.columns([1, 3, 1])
+chat = st.text_input("변환할 키워드를 입력해주세요.")
 
-    with center:
-        if st.session_state.current_page == "sentence":
-            sentence_widget()
-        elif st.session_state.current_page == "gallery":
-            gallery_view()
-    
+if chat:
+    with st.spinner("Symbol 생성 중..."):
+        pair = st.session_state.user_data.find_or_generate_symbol(chat)
+        st.image(pair.image, width=320, output_format="PNG")
+        st.header(pair.text)
+
+st.space("medium")
+
+gallery()
