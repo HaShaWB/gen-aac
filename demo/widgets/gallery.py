@@ -1,5 +1,6 @@
 # demo/widgets/gallery.py
 
+import re
 import streamlit as st
 
 
@@ -7,13 +8,13 @@ def gallery():
     user_data = st.session_state.user_data
     gallery = user_data.symbol_gallery
 
-    # 5열 배치를 위해 아이템들을 리스트로 변환
+    # 4열 배치를 위해 아이템들을 리스트로 변환
     items = list(gallery.items())
     
-    # 5개씩 묶어서 행 단위로 처리
-    for row_start in range(0, len(items), 5):
-        cols = st.columns(5)
-        row_items = items[row_start:row_start + 5]
+    # 4개씩 묶어서 행 단위로 처리
+    for row_start in range(0, len(items), 4):
+        cols = st.columns(4)
+        row_items = items[row_start:row_start + 4]
         
         for col_idx, (keyword, pair) in enumerate(row_items):
             with cols[col_idx]:
@@ -29,11 +30,15 @@ def gallery():
                     # 재생성 중인지 확인
                     is_regenerating = st.session_state.get("regenerating", False)
                     
+                    # 괄호 내용은 툴팁으로 분리 (레이아웃 진동 방지)
+                    display_label = re.sub(r'\s*\([^)]*\)', '', keyword).strip()
+                    
                     clicked = st.button(
-                        label=f"{keyword}",
+                        label=display_label or keyword,
+                        help=keyword if display_label != keyword else None,
                         width="stretch",
                         disabled=is_regenerating,
-                        key=f"gallery_btn_{keyword}"
+                        key=f"gallery_btn_{hash(keyword)}"
                     )
                     if clicked:
                         st.session_state["regenerating"] = True

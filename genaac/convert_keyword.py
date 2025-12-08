@@ -32,8 +32,7 @@ def convert_keyword(keyword: str) -> str:
     response = generate_llm_response(
         messages,
         primary_llm=PRIMARY_KEYWORD_LLM,
-        secondary_llm=SECONDARY_KEYWORD_LLM,
-        reasoning_effort="low"
+        secondary_llm=SECONDARY_KEYWORD_LLM
     )
 
     print(f"[CONVERT KEYWORD] {keyword} -> {response}")
@@ -54,7 +53,6 @@ def convert_keyword_parallel(keywords: List[str]) -> List[str]:
         messages_list,
         primary_llm=PRIMARY_KEYWORD_LLM,
         secondary_llm=SECONDARY_KEYWORD_LLM,
-        reasoning_effort="low"
     )
     
     print(f"[CONVERT KEYWORD PARALLEL] {keywords} -> {response}")
