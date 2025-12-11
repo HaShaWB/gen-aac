@@ -47,7 +47,7 @@ def generate_llm_response_in_json(
     schema: BaseModel, **kwargs) -> Optional[BaseModel]:
 
     try:
-        response = generate_llm_response(messages, response_format=schema, drop_params=True, **kwargs)
+        response = generate_llm_response(messages, response_format=schema, **kwargs)
         return schema.model_validate_json(response)
     except Exception as e:
         print(f"[LLM] Error in validating json response: {e}")
