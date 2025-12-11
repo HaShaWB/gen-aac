@@ -2,21 +2,24 @@
 
 from typing import List
 
-from genaac.config import AAC_FROM_KEYWORD_PROMPT
+from genaac.config import AAC_FROM_KEYWORD_PROMPT, ROOT_DIR
 from genaac.utils import (
     generate_banana_response,
     generate_banana_response_parallel,
     ImageTextPair,
+    file_to_bytes,
 )
-from genaac.convert_keyword import convert_keyword, convert_keyword_parallel
 
+HUMAN_SYMBOL = ImageTextPair(
+    image=file_to_bytes(ROOT_DIR / "templates" / "human.png"),
+    text="예시: '사람' \n주어진 이미지는 사람을 나타내는 AAC Symbol이야. 키워드에 사람이 들어간다면 참고해."
+)
 
-def aac_from_keyword(keyword: str, converting_keyword: bool = True) -> ImageTextPair:
-    if converting_keyword:
-        keyword = convert_keyword(keyword)
+def aac_from_keyword(keyword: str) -> ImageTextPair:
 
     messages = [
         {"role": "system", "content": AAC_FROM_KEYWORD_PROMPT},
+        HUMAN_SYMBOL.to_chat(),
         {"role": "user", "content": f"키워드: {keyword}"}
     ]
 
@@ -29,17 +32,14 @@ def aac_from_keyword(keyword: str, converting_keyword: bool = True) -> ImageText
 
 
 def aac_from_keyword_parallel(
-    keywords: List[str], 
-    converting_keyword: bool = True, 
+    keywords: List[str],
     max_workers: int = 5
 ) -> List[ImageTextPair]:
-
-    if converting_keyword:
-        keywords = convert_keyword_parallel(keywords)
 
     messages_list = [
         [
             {"role": "system", "content": AAC_FROM_KEYWORD_PROMPT},
+            HUMAN_SYMBOL.to_chat(),
             {"role": "user", "content": f"키워드: {keyword}"}
         ]
         for keyword in keywords

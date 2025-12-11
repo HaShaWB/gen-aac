@@ -1,6 +1,6 @@
 # genaac/tokenizing.py
 
-from typing import List
+from typing import List, Literal
 
 from pydantic import BaseModel
 
@@ -9,8 +9,10 @@ from genaac.utils import generate_llm_response_in_json
 
 class Token(BaseModel):
     keyword: str
-    type: str
-    syntax: str
+    syntax: Literal["None", "부정", "의문"]
+
+class Tokens(BaseModel):
+    tokens: List[Token]
 
 
 def tokenizing(sentence: str) -> List[Token]:
@@ -19,5 +21,8 @@ def tokenizing(sentence: str) -> List[Token]:
         {"role": "user", "content": sentence}
     ]
 
-    response = generate_llm_response_in_json(messages, Token)
-    return response
+    response = generate_llm_response_in_json(messages, Tokens)
+
+    print(f"[TOKENIZING] Tokenizing Ended: {sentence} -> {response}")
+
+    return response.tokens

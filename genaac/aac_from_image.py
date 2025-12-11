@@ -2,18 +2,20 @@
 
 from typing import List
 
-from genaac.config import AAC_FROM_IMAGE_PROMPT
+from genaac.config import AAC_FROM_IMAGE_PROMPT, ROOT_DIR
 from genaac.utils import (
     generate_banana_response,
     generate_banana_response_parallel,
     ImageTextPair,
+    file_to_bytes,
 )
-from genaac.convert_keyword import convert_keyword, convert_keyword_parallel
 
+HUMAN_SYMBOL = ImageTextPair(
+    image=file_to_bytes(ROOT_DIR / "templates" / "human.png"),
+    text="예시: '사람' \n주어진 이미지는 사람을 나타내는 AAC Symbol이야. 키워드에 사람이 들어간다면 참고해."
+)
 
-def aac_from_image(keyword: str, image: bytes, converting_keyword: bool = True) -> ImageTextPair:
-    if converting_keyword:
-        keyword = convert_keyword(keyword)
+def aac_from_image(keyword: str, image: bytes) -> ImageTextPair:
 
     pair = ImageTextPair(
         image=image,
@@ -22,6 +24,7 @@ def aac_from_image(keyword: str, image: bytes, converting_keyword: bool = True) 
 
     messages = [
         {"role": "system", "content": AAC_FROM_IMAGE_PROMPT},
+        HUMAN_SYMBOL.to_chat(),
         pair.to_chat(),
     ]
 
@@ -36,7 +39,6 @@ def aac_from_image(keyword: str, image: bytes, converting_keyword: bool = True) 
 def aac_from_image_parallel(
     keywords: List[str], 
     images: List[bytes],
-    converting_keyword: bool = True,
     max_workers: int = 5
 ) -> List[ImageTextPair]:
     """
@@ -50,12 +52,11 @@ def aac_from_image_parallel(
     Returns:
         ImageTextPair 리스트 (순서 유지)
     """
-    if converting_keyword:
-        keywords = convert_keyword_parallel(keywords)
 
     messages_list = [
         [
             {"role": "system", "content": AAC_FROM_IMAGE_PROMPT},
+            HUMAN_SYMBOL.to_chat(),
             ImageTextPair(
                 image=image,
                 text=f"키워드: {keyword}\n\n이미지를 그대로 스타일만 변화시키는 것이 아니라, 이미지의 객체를 AAC Symbol로 표현해야해."

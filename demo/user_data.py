@@ -1,7 +1,6 @@
 # demo/user_data.py
 
 import hashlib
-import uuid
 from typing import Dict
 
 import streamlit as st
@@ -19,29 +18,23 @@ USER_DATA_BUCKET_NAME = CONFIG["database"]["user_data_bucket_name"]
 
 def get_user_hash() -> str:
     """
-    접속한 유저를 세션 기반 UUID + 브라우저 정보 조합으로 고유 식별한다.
-    같은 WiFi/IP를 쓰더라도 브라우저 탭(세션)별로 구분됨.
+    접속한 유저를 IP + 브라우저 정보 조합으로 고유 식별한다.
+    같은 기기(같은 IP, 같은 브라우저)에서는 새로고침해도 동일한 해시 반환.
     """
-    # 세션에 고유 UUID가 없으면 새로 생성
-    if "_user_session_id" not in st.session_state:
-        st.session_state._user_session_id = str(uuid.uuid4())
-    
-    session_id = st.session_state._user_session_id
-    
-    # Streamlit 컨텍스트에서 클라이언트 정보 추출 (추가 구분용)
+    # Streamlit 컨텍스트에서 클라이언트 정보 추출
     headers = st.context.headers
     
     if headers is None:
-        return hashlib.sha256(session_id.encode()).hexdigest()[:12]
+        # 헤더 정보가 없는 경우 기본 해시 생성
+        return hashlib.sha256("default_user".encode()).hexdigest()[:12]
     
-    # 다양한 헤더 정보를 조합하여 fingerprint 생성
-    remote_ip = headers.get("X-Forwarded-For", "127.0.0.1")
+    # IP와 브라우저 정보를 조합하여 fingerprint 생성
+    remote_ip = headers.get("X-Forwarded-For", headers.get("X-Real-Ip", "127.0.0.1"))
     user_agent = headers.get("User-Agent", "unknown_agent")
     accept_lang = headers.get("Accept-Language", "")
-    accept_encoding = headers.get("Accept-Encoding", "")
     
-    # 세션 ID + 브라우저 fingerprint 조합
-    unique_str = f"{session_id}_{remote_ip}_{user_agent}_{accept_lang}_{accept_encoding}"
+    # IP + 브라우저 정보 조합 (새로고침해도 동일)
+    unique_str = f"{remote_ip}_{user_agent}_{accept_lang}"
     
     # SHA256으로 해싱하여 짧은 ID 생성
     return hashlib.sha256(unique_str.encode()).hexdigest()[:12]
@@ -51,34 +44,6 @@ class UserData(BaseModel):
     user_id: str = get_user_hash()
     symbol_gallery: Dict[str, ImageTextPair] = {}
 
-
-    def regenerate_symbol(self, keyword: str, converting_keyword: bool = True):
-        pair = aac_from_keyword(keyword, converting_keyword=converting_keyword)
-        self.add_symbol(pair)
-        upload_file(pair.image, f"{keyword}/{make_id()}.png")
-        return pair
-
-
-    def find_or_generate_symbol(self, keyword: str):
-        keyword = convert_keyword(keyword)
-        if keyword in self.symbol_gallery:
-            return self.symbol_gallery[keyword]
-        else:
-            return self.regenerate_symbol(keyword, converting_keyword=False)
-
-    def regenerate_symbol_from_image(self, keyword: str, image: bytes, converting_keyword: bool = True):
-        pair = aac_from_image(keyword, image, converting_keyword=converting_keyword)
-        self.add_symbol(pair)
-        upload_file(pair.image, f"{keyword}/{make_id()}.png")
-        return pair
-
-
-    def find_or_generate_symbol_from_image(self, keyword: str, image: bytes):
-        keyword = convert_keyword(keyword)
-        if keyword in self.symbol_gallery:
-            return self.symbol_gallery[keyword]
-        else:
-            return self.regenerate_symbol_from_image(keyword, image, converting_keyword=False)
 
     def add_symbol(self, pair: ImageTextPair):
         self.symbol_gallery[pair.text] = pair
@@ -94,7 +59,7 @@ class UserData(BaseModel):
         print(f"[USER DATA] Upload {self.user_id}: {keyword}")
 
 
-    def upload_server(self):
+    def upload_userdata(self):
         """
         로컬의 심볼 갤러리 이미지들을 서버(GCS)로 병렬 업로드함.
         """
@@ -111,7 +76,7 @@ class UserData(BaseModel):
         print(f"[USER DATA] Upload {self.user_id}: {len(uploaded_files)} files")
 
 
-    def download_server(self):
+    def download_userdata(self):
         """
         서버(GCS)의 심볼 갤러리 이미지들을 병렬 다운로드하여 로컬에 반영함.
         """
