@@ -6,3 +6,4 @@ from .aac_from_image import aac_from_image, aac_from_image_parallel
 from .aac_from_keyword import aac_from_keyword, aac_from_keyword_parallel
 from .tokenizing import Token, tokenizing
 from .aac_syntax import add_cross, add_question_mark
+from .convert_keyword import convert_keyword, convert_keyword_parallel
