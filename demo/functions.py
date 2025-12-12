@@ -53,7 +53,7 @@ def process_keyword(keyword: str, user_data: UserData):
 
 def process_image_keyword(keyword: str, image: bytes, user_data: UserData):
     print(f"[PROCESS IMAGE KEYWORD] Processing: {keyword}")
-    keyword = convert_keyword(keyword)
+    # keyword = convert_keyword(keyword)
     pair = aac_from_image(keyword, image)
     user_data.add_symbol(pair)
     return pair
