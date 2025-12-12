@@ -4,7 +4,8 @@ from genaac import (
     aac_from_keyword, aac_from_keyword_parallel,
     aac_from_image,
     tokenizing, Token,
-    add_cross, add_question_mark
+    add_cross, add_question_mark,
+    convert_keyword,
 )
 from demo.user_data import UserData
 from genaac.utils import ImageTextPair
@@ -51,6 +52,8 @@ def process_keyword(keyword: str, user_data: UserData):
 
 
 def process_image_keyword(keyword: str, image: bytes, user_data: UserData):
+    print(f"[PROCESS IMAGE KEYWORD] Processing: {keyword}")
+    keyword = convert_keyword(keyword)
     pair = aac_from_image(keyword, image)
     user_data.add_symbol(pair)
     return pair
